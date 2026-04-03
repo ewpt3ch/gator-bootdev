@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/google/uuid"
+	"time"
+
+	"github.com/ewpt3ch/gator-bootdev/internal/database"
 )
 
 func handlerLogin(s *state, cmd command) error {
@@ -11,11 +16,48 @@ func handlerLogin(s *state, cmd command) error {
 
 	username := cmd.arguments[0]
 
-	err := s.cfg.SetUser(username)
+	user, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return err
+	}
+
+	err = s.cfg.SetUser(username)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("Set user to %s", username)
+	fmt.Println(user)
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error {
+	if len(cmd.arguments) == 0 {
+		return fmt.Errorf("No username given")
+	}
+
+	id := uuid.New()
+	timeNow := time.Now()
+	username := cmd.arguments[0]
+	dbParams := database.CreateUserParams{
+		ID:        id,
+		CreatedAt: timeNow,
+		UpdatedAt: timeNow,
+		Name:      username,
+	}
+
+	user, err := s.db.CreateUser(context.Background(), dbParams)
+	if err != nil {
+		return err
+	}
+
+	err = s.cfg.SetUser(username)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Created user: %s", username)
+	fmt.Println(user)
+
 	return nil
 }
