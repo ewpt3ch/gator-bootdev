@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/ewpt3ch/gator-bootdev/internal/config"
@@ -18,14 +18,18 @@ type state struct {
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		fmt.Printf("Error getting config: %s", err)
+		log.Fatalf("Error getting config: %v", err)
 	}
 
 	dbURL := cfg.DB_url
 	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("error connecting to db: %v", err)
+	}
+	defer db.Close()
 	dbQueries := database.New(db)
 
-	s := state{
+	programState := state{
 		db:  dbQueries,
 		cfg: &cfg,
 	}
@@ -38,15 +42,13 @@ func main() {
 	cmds.register("agg", handlerAgg)
 	cmds.register("addfeed", handlerAddFeed)
 
-	if len(os.Args) == 0 {
-		fmt.Println("Not enough arguments")
-		os.Exit(1)
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: cli <command> [args...]")
 	}
 
 	userCommand := command{os.Args[1], os.Args[2:]}
-	err = cmds.run(&s, userCommand)
+	err = cmds.run(&programState, userCommand)
 	if err != nil {
-		fmt.Printf("Failed to run command %s: %s", userCommand.name, err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
