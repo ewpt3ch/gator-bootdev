@@ -10,7 +10,7 @@ import (
 )
 
 func handlerLogin(s *state, cmd command) error {
-	if len(cmd.arguments) == 0 {
+	if len(cmd.arguments) != 1 {
 		return fmt.Errorf("No username given")
 	}
 
@@ -32,7 +32,7 @@ func handlerLogin(s *state, cmd command) error {
 }
 
 func handlerRegister(s *state, cmd command) error {
-	if len(cmd.arguments) == 0 {
+	if len(cmd.arguments) != 1 {
 		return fmt.Errorf("No username given")
 	}
 
