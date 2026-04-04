@@ -33,6 +33,7 @@ func main() {
 	cmds := commands{handlers: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerResetUsers)
 
 	if len(os.Args) == 0 {
 		fmt.Println("Not enough arguments")
