@@ -16,7 +16,7 @@ func handlerLogin(s *state, cmd command) error {
 
 	username := cmd.arguments[0]
 
-	user, err := s.db.GetUser(context.Background(), username)
+	user, err := s.db.GetUserByName(context.Background(), username)
 	if err != nil {
 		return err
 	}

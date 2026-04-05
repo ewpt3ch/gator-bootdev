@@ -16,7 +16,7 @@ func handlerAddFeed(s *state, cmd command) error {
 
 	userName := s.cfg.Current_user_name
 
-	user, err := s.db.GetUser(context.Background(), userName)
+	user, err := s.db.GetUserByName(context.Background(), userName)
 	if err != nil {
 		return err
 	}
@@ -42,6 +42,28 @@ func handlerAddFeed(s *state, cmd command) error {
 
 	fmt.Printf("Created feed: %s\n", feedName)
 	printFeed(feed)
+
+	return nil
+}
+
+func handlerGetFeeds(s *state, cmd command) error {
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return err
+	}
+
+	for _, feed := range feeds {
+
+		userid := feed.UserID
+		user, err := s.db.GetUserByID(context.Background(), userid)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("* Feed name:				%s\n", feed.Name)
+		fmt.Printf("* Feed URL:					%s\n", feed.Url)
+		fmt.Printf("* User Name:				%s\n", user.Name)
+	}
 
 	return nil
 }
