@@ -43,6 +43,15 @@ func handlerAddFeed(s *state, cmd command) error {
 	fmt.Printf("Created feed: %s\n", feedName)
 	printFeed(feed)
 
+	urlCMD := command{
+		name:      "temp",
+		arguments: []string{url},
+	}
+	err = handlerCreateFeedFollow(s, urlCMD)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
