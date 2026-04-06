@@ -9,14 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerCreateFeedFollow(s *state, cmd command) error {
+func handlerCreateFeedFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 1 {
 		return fmt.Errorf("Expected a singer argument: <url>")
-	}
-
-	user, err := s.db.GetUserByName(context.Background(), s.cfg.Current_user_name)
-	if err != nil {
-		return err
 	}
 
 	url := cmd.arguments[0]
@@ -48,12 +43,7 @@ func handlerCreateFeedFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerGetFeedFollowsForUser(s *state, cmd command) error {
-	user, err := s.db.GetUserByName(context.Background(), s.cfg.Current_user_name)
-	if err != nil {
-		return err
-	}
-
+func handlerGetFeedFollowsForUser(s *state, cmd command, user database.User) error {
 	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return err

@@ -9,16 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 2 {
 		return fmt.Errorf("Expected 2 arguments: <feed name> <url>")
-	}
-
-	userName := s.cfg.Current_user_name
-
-	user, err := s.db.GetUserByName(context.Background(), userName)
-	if err != nil {
-		return err
 	}
 
 	id := uuid.New()
@@ -47,7 +40,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		name:      "temp",
 		arguments: []string{url},
 	}
-	err = handlerCreateFeedFollow(s, urlCMD)
+	err = handlerCreateFeedFollow(s, urlCMD, user)
 	if err != nil {
 		return err
 	}
@@ -55,20 +48,13 @@ func handlerAddFeed(s *state, cmd command) error {
 	return nil
 }
 
-func handlerGetFeeds(s *state, cmd command) error {
+func handlerGetFeeds(s *state, cmd command, user database.User) error {
 	feeds, err := s.db.GetFeeds(context.Background())
 	if err != nil {
 		return err
 	}
 
 	for _, feed := range feeds {
-
-		userid := feed.UserID
-		user, err := s.db.GetUserByID(context.Background(), userid)
-		if err != nil {
-			return err
-		}
-
 		fmt.Printf("* Feed name:				%s\n", feed.Name)
 		fmt.Printf("* Feed URL:					%s\n", feed.Url)
 		fmt.Printf("* User Name:				%s\n", user.Name)
